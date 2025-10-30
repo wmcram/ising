@@ -1,6 +1,8 @@
+.PHONY: run
 run: build
-	./build/ising
+	./target/ising
 
+.PHONY: build
 build:
-	mkdir -p build
-	g++ main.cpp -o build/ising
+	mkdir -p target
+	g++ main.cpp -o target/ising
