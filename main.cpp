@@ -1,9 +1,7 @@
 #include <chrono>
 #include <cmath>
-#include <cstdlib>
 #include <iostream>
 #include <random>
-#include <ratio>
 #include <thread>
 
 struct Ising {
@@ -36,7 +34,7 @@ struct Ising {
   }
 
   // Gets the total energy of the system
-  double total_energy(double J) const {
+  double total_energy() const {
     double E = 0.0;
     for (int x = 0; x < L; x++) {
       for (int y = 0; y < L; y++) {
@@ -72,29 +70,34 @@ struct Ising {
     }
   }
 
+  // Prints the state of the spins to the terminal.
   void print_state() {
-    std::system("clear");
+    std::cout << "\x1B[2J\x1B[H";
     for (int i = 0; i < L; i++) {
       for (int j = 0; j < L; j++) {
         std::cout << ((spins[get_idx(i, j)] == 1) ? "+" : "-") << " ";
       }
       std::cout << "\n";
     }
+    std::cout << "T: " << T << " E: " << total_energy() << std::endl;
   }
 
-  void sweep_iter(int rounds, int delay = 0) {
+  // Iterates the sweep() method for a number of rounds, printing the state and
+  // then sleeping in between each round for the specified delay.
+  void sweep_iter(int rounds, int delay = 0, double delta_temp = 0.0) {
     for (int i = 0; i < rounds; i++) {
       sweep();
       print_state();
       if (delay > 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
       }
+      T += delta_temp;
     }
   }
 };
 
 int main(int argc, char *argv[]) {
-  Ising ising(27, 3.0, 1.0);
-  ising.sweep_iter(1000, 250);
+  Ising ising(27, 2.5, 1.0);
+  ising.sweep_iter(1000, 250, -0.01);
   return 0;
 }
